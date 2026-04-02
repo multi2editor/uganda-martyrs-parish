@@ -4,8 +4,9 @@ export default function Home() {
       
       {/* HERO SECTION */}
       <section style={{
-        background: 'linear-gradient(90deg, rgba(139,14,14,0.95) 40%, rgba(139,14,14,0.7) 100%)',
-        backgroundColor: '#8b0e0e',
+        backgroundImage: 'linear-gradient(90deg, rgba(139,14,14,0.92) 40%, rgba(139,14,14,0.6) 100%), url(/church_banner.webp)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         minHeight: '420px',
         display: 'flex',
         alignItems: 'center',
