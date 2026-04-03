@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import NotificationPrompt from "./components/NotificationPrompt";
 
 export const metadata: Metadata = {
   title: "Uganda Martyrs Parish",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body>
         <Navbar />
         {children}
+        <NotificationPrompt />
       </body>
     </html>
   );
