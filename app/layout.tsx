@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import NotificationPrompt from "./components/NotificationPrompt";
+import LoadingScreen from "./components/LoadingScreen"; 
 
 export const metadata: Metadata = {
   title: "Uganda Martyrs Parish",
@@ -16,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <LoadingScreen />
         <Navbar />
         {children}
         <NotificationPrompt />
