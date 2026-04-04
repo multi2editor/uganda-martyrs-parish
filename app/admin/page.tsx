@@ -1,11 +1,10 @@
 'use client'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase.js'
-import { useState } from 'react'
 
 export default function Admin() {
   const [page, setPage] = useState('dashboard')
-
+  const [authorized, setAuthorized] = useState(false)
   const [announcements, setAnnouncements] = useState([
     {title: 'Sunday Service Time Change', category: 'Urgent', date: 'Mar 28', body: 'Starting this Sunday, our main service will begin at 9:00 AM.'},
     {title: 'Youth Camp Registration Open', category: 'Youth', date: 'Mar 25', body: 'Limited slots available — register before 30th April.'},
@@ -17,9 +16,42 @@ export default function Admin() {
     {id: 3, name: 'Peter Dube', type: 'Baby Dedication', date: 'May 24', status: 'pending'},
     {id: 4, name: 'Grace Sithole', type: 'Baptism', date: 'Apr 27', status: 'approved'},
   ])
+  const [groupMembers, setGroupMembers] = useState<any[]>([])
+  const [giveawayEntries, setGiveawayEntries] = useState<any[]>([])
   const [newTitle, setNewTitle] = useState('')
   const [newBody, setNewBody] = useState('')
   const [newCat, setNewCat] = useState('General')
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        window.location.href = '/login'
+        return
+      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single()
+      if (profile && profile.role === 'admin') {
+        setAuthorized(true)
+        loadData()
+      } else {
+        window.location.href = '/'
+      }
+    }
+    checkAdmin()
+  }, [])
+
+  const loadData = async () => {
+    const { data: gm } = await supabase.from('group_members').select('*').order('created_at', {ascending: false})
+    if (gm) setGroupMembers(gm)
+    const { data: ge } = await supabase.from('giveaway_entries').select('*').order('created_at', {ascending: false})
+    if (ge) setGiveawayEntries(ge)
+    const { data: bk } = await supabase.from('bookings').select('*').order('created_at', {ascending: false})
+    if (bk) setBookings(bk.map((b: any, i: number) => ({id: i+1, name: b.full_name, type: b.event_type, date: b.preferred_date, status: b.status})))
+  }
 
   const postAnnouncement = async () => {
     if (!newTitle || !newBody) return
@@ -41,9 +73,11 @@ export default function Admin() {
     {id: 'bookings', label: 'Bookings', icon: '📅'},
     {id: 'announcements', label: 'Announcements', icon: '📢'},
     {id: 'members', label: 'Members', icon: '👥'},
+    {id: 'groups', label: 'Group Requests', icon: '🤝'},
+    {id: 'giveaway_entries', label: 'Giveaway Entries', icon: '🎁'},
     {id: 'donations', label: 'Donations', icon: '💰'},
     {id: 'gallery', label: 'Gallery', icon: '🖼'},
-    {id: 'giveaways', label: 'Giveaways', icon: '🎁'},
+    {id: 'giveaways', label: 'Giveaways', icon: '🎀'},
   ]
 
   const sidebarStyle = {
@@ -72,6 +106,16 @@ export default function Admin() {
     background: status === 'approved' ? '#eaf5ee' : status === 'declined' ? '#fdeaea' : '#fff8e0',
     color: status === 'approved' ? '#1a7a3a' : status === 'declined' ? '#8b0e0e' : '#b07800'
   })
+
+  if (!authorized) {
+    return (
+      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', flexDirection: 'column' as const, gap: '1rem'}}>
+        <div style={{width: '40px', height: '40px', border: '3px solid #e4e0d8', borderTop: '3px solid #8b0e0e', borderRadius: '50%', animation: 'spin 1s linear infinite'}}></div>
+        <p style={{color: '#7a6e6e', fontSize: '14px'}}>Checking access...</p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    )
+  }
 
   return (
     <div style={{display: 'flex', minHeight: '100vh', background: '#f5f4f2'}}>
@@ -115,7 +159,7 @@ export default function Admin() {
         
         {/* TOPBAR */}
         <div style={{background: 'white', borderBottom: '1px solid #e4e0d8', padding: '0 1.5rem', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-          <h2 style={{fontFamily: 'Georgia, serif', fontSize: '1.3rem', color: '#8b0e0e', textTransform: 'capitalize' as const}}>{page}</h2>
+          <h2 style={{fontFamily: 'Georgia, serif', fontSize: '1.3rem', color: '#8b0e0e', textTransform: 'capitalize' as const}}>{page.replace('_', ' ')}</h2>
           <span style={{fontSize: '12px', color: '#7a6e6e'}}>Uganda Martyrs Parish Admin</span>
         </div>
 
@@ -140,7 +184,7 @@ export default function Admin() {
                     {bookings.slice(0, 3).map(b => (
                       <div key={b.id} style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', borderBottom: '1px solid #e4e0d8'}}>
                         <div style={{width: '32px', height: '32px', background: '#eaf0fb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '500', color: '#1a4a8c', flexShrink: 0}}>
-                          {b.name.split(' ').map(n => n[0]).join('')}
+                          {b.name.split(' ').map((n: string) => n[0]).join('')}
                         </div>
                         <div style={{flex: 1}}>
                           <p style={{fontSize: '12.5px', fontWeight: '500'}}>{b.name}</p>
@@ -179,7 +223,7 @@ export default function Admin() {
                 {bookings.map(b => (
                   <div key={b.id} style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0', borderBottom: '1px solid #e4e0d8'}}>
                     <div style={{width: '36px', height: '36px', background: '#eaf0fb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '500', color: '#1a4a8c', flexShrink: 0}}>
-                      {b.name.split(' ').map(n => n[0]).join('')}
+                      {b.name.split(' ').map((n: string) => n[0]).join('')}
                     </div>
                     <div style={{flex: 1}}>
                       <p style={{fontSize: '13px', fontWeight: '500'}}>{b.name}</p>
@@ -272,9 +316,9 @@ export default function Admin() {
                       <td style={{padding: '8px 10px', color: '#7a6e6e'}}>{m.joined}</td>
                       <td style={{padding: '8px 10px'}}>
                         <select style={{fontSize: '11.5px', border: '1px solid #e4e0d8', borderRadius: '3px', padding: '3px 6px', fontFamily: 'Inter, sans-serif'}}>
-                          <option selected={m.role === 'Admin'}>Admin</option>
-                          <option selected={m.role === 'Staff'}>Staff</option>
-                          <option selected={m.role === 'Member'}>Member</option>
+                          <option>Admin</option>
+                          <option>Staff</option>
+                          <option>Member</option>
                         </select>
                       </td>
                       <td style={{padding: '8px 10px'}}><span style={{fontSize: '10px', background: '#eaf5ee', color: '#1a7a3a', padding: '2px 8px', borderRadius: '2px', fontWeight: '500'}}>Active</span></td>
@@ -282,6 +326,60 @@ export default function Admin() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* GROUP REQUESTS */}
+          {page === 'groups' && (
+            <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
+              <div style={{padding: '0.75rem 1rem', borderBottom: '1px solid #e4e0d8'}}>
+                <h3 style={{fontSize: '13px', fontWeight: '500'}}>Group join requests ({groupMembers.length})</h3>
+              </div>
+              <div style={{padding: '0.75rem 1rem'}}>
+                {groupMembers.length === 0 ? (
+                  <p style={{fontSize: '13px', color: '#7a6e6e', textAlign: 'center', padding: '2rem'}}>No group requests yet.</p>
+                ) : groupMembers.map((m, i) => (
+                  <div key={i} style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0', borderBottom: '1px solid #e4e0d8'}}>
+                    <div style={{width: '36px', height: '36px', background: '#eaf0fb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '500', color: '#1a4a8c', flexShrink: 0}}>
+                      {m.full_name?.split(' ').map((n: string) => n[0]).join('')}
+                    </div>
+                    <div style={{flex: 1}}>
+                      <p style={{fontSize: '13px', fontWeight: '500'}}>{m.full_name}</p>
+                      <p style={{fontSize: '11.5px', color: '#7a6e6e'}}>{m.phone} · {m.group_name}</p>
+                    </div>
+                    <span style={{fontSize: '10px', background: '#fff8e0', color: '#b07800', padding: '2px 8px', borderRadius: '2px', fontWeight: '500'}}>
+                      {new Date(m.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* GIVEAWAY ENTRIES */}
+          {page === 'giveaway_entries' && (
+            <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
+              <div style={{padding: '0.75rem 1rem', borderBottom: '1px solid #e4e0d8'}}>
+                <h3 style={{fontSize: '13px', fontWeight: '500'}}>Giveaway entries ({giveawayEntries.length})</h3>
+              </div>
+              <div style={{padding: '0.75rem 1rem'}}>
+                {giveawayEntries.length === 0 ? (
+                  <p style={{fontSize: '13px', color: '#7a6e6e', textAlign: 'center', padding: '2rem'}}>No entries yet.</p>
+                ) : giveawayEntries.map((e, i) => (
+                  <div key={i} style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0', borderBottom: '1px solid #e4e0d8'}}>
+                    <div style={{width: '36px', height: '36px', background: '#fff8e0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '500', color: '#b07800', flexShrink: 0}}>
+                      {e.full_name?.split(' ').map((n: string) => n[0]).join('')}
+                    </div>
+                    <div style={{flex: 1}}>
+                      <p style={{fontSize: '13px', fontWeight: '500'}}>{e.full_name}</p>
+                      <p style={{fontSize: '11.5px', color: '#7a6e6e'}}>{e.phone} · {e.giveaway_title}</p>
+                    </div>
+                    <span style={{fontSize: '10px', background: '#eaf5ee', color: '#1a7a3a', padding: '2px 8px', borderRadius: '2px', fontWeight: '500'}}>
+                      {new Date(e.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -326,44 +424,42 @@ export default function Admin() {
             </div>
           )}
 
-            {/* GALLERY */}
-{page === 'gallery' && (
-  <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
-    <div style={{padding: '0.75rem 1rem', borderBottom: '1px solid #e4e0d8'}}>
-      <h3 style={{fontSize: '13px', fontWeight: '500'}}>Upload photos</h3>
-    </div>
-    <div style={{padding: '1.25rem'}}>
-      <div style={{border: '2px dashed #e4e0d8', borderRadius: '6px', padding: '2rem', textAlign: 'center', marginBottom: '1.25rem'}}>
-        <p style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>🖼</p>
-        <p style={{fontSize: '13px', fontWeight: '500', color: '#8b0e0e', marginBottom: '4px'}}>Upload parish photos</p>
-        <p style={{fontSize: '12px', color: '#7a6e6e', marginBottom: '1rem'}}>JPG, PNG up to 10MB</p>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={async (e) => {
-            const files = e.target.files
-            if (!files) return
-            for (const file of Array.from(files)) {
-              await supabase.storage.from('gallery').upload(
-                `${Date.now()}-${file.name}`,
-                file
-              )
-            }
-            alert('Photos uploaded successfully!')
-          }}
-          style={{display: 'none'}}
-          id="gallery-upload"
-        />
-        <label htmlFor="gallery-upload" style={{background: '#8b0e0e', color: 'white', padding: '8px 20px', borderRadius: '3px', fontSize: '13px', fontWeight: '500', cursor: 'pointer'}}>
-          Choose Photos
-        </label>
-      </div>
-      <p style={{fontSize: '12px', color: '#7a6e6e'}}>Uploaded photos will appear automatically on the public gallery page.</p>
-    </div>
-  </div>
-)}
-{/* GIVEAWAYS */}
+          {/* GALLERY */}
+          {page === 'gallery' && (
+            <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
+              <div style={{padding: '0.75rem 1rem', borderBottom: '1px solid #e4e0d8'}}>
+                <h3 style={{fontSize: '13px', fontWeight: '500'}}>Upload photos</h3>
+              </div>
+              <div style={{padding: '1.25rem'}}>
+                <div style={{border: '2px dashed #e4e0d8', borderRadius: '6px', padding: '2rem', textAlign: 'center', marginBottom: '1.25rem'}}>
+                  <p style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>🖼</p>
+                  <p style={{fontSize: '13px', fontWeight: '500', color: '#8b0e0e', marginBottom: '4px'}}>Upload parish photos</p>
+                  <p style={{fontSize: '12px', color: '#7a6e6e', marginBottom: '1rem'}}>JPG, PNG up to 10MB</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={async (e) => {
+                      const files = e.target.files
+                      if (!files) return
+                      for (const file of Array.from(files)) {
+                        await supabase.storage.from('gallery').upload(`${Date.now()}-${file.name}`, file)
+                      }
+                      alert('Photos uploaded successfully!')
+                    }}
+                    style={{display: 'none'}}
+                    id="gallery-upload"
+                  />
+                  <label htmlFor="gallery-upload" style={{background: '#8b0e0e', color: 'white', padding: '8px 20px', borderRadius: '3px', fontSize: '13px', fontWeight: '500', cursor: 'pointer'}}>
+                    Choose Photos
+                  </label>
+                </div>
+                <p style={{fontSize: '12px', color: '#7a6e6e'}}>Uploaded photos appear automatically on the public gallery page.</p>
+              </div>
+            </div>
+          )}
+
+          {/* GIVEAWAYS */}
           {page === 'giveaways' && (
             <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'start'}}>
               <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
