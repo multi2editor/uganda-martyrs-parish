@@ -28,7 +28,7 @@ export default function Contact() {
             {
               icon: '⏰',
               title: 'Service Times',
-              lines: ['Sunday Mass: 9:00 AM & 11:30 AM', 'Wednesday Bible Study: 6:00 PM', 'Friday Women\'s Ministry: 5:00 PM', 'Saturday Men\'s Fellowship: 7:00 AM']
+              lines: ['Sunday Mass: 7:30 AM & 10:00 AM', 'Wednesday Bible Study: 6:00 PM', 'Friday Women\'s Ministry: 5:00 PM', 'Saturday Men\'s Fellowship: 7:00 AM']
             },
             {
               icon: '📅',
