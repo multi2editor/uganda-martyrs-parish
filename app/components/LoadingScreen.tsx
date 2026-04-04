@@ -51,7 +51,7 @@ export default function LoadingScreen() {
       {/* CHURCH NAME */}
       <h1 style={{
         fontFamily: 'Georgia, serif',
-        fontSize: '1.5rem',
+        fontSize: 'clamp(1.1rem, 5vw, 1.5rem)',
         color: 'white',
         marginBottom: '0.25rem',
         letterSpacing: '0.5px'

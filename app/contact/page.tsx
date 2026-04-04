@@ -5,7 +5,7 @@ export default function Contact() {
       <div style={{width: '44px', height: '3px', background: '#c9a030', marginBottom: '1rem', borderRadius: '2px'}}></div>
       <p style={{color: '#7a6e6e', fontSize: '14.5px', marginBottom: '2.5rem'}}>We'd love to hear from you. Come visit us or get in touch anytime.</p>
 
-      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem'}}>
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem'}}>
         
         {/* CONTACT DETAILS */}
         <div>

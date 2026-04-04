@@ -59,7 +59,7 @@ export default function Bookings() {
       <div style={{width: '44px', height: '3px', background: '#c9a030', marginBottom: '1rem', borderRadius: '2px'}}></div>
       <p style={{color: '#7a6e6e', fontSize: '14.5px', marginBottom: '2.5rem'}}>Fill in the form below to request a booking. We will confirm within 2 working days.</p>
 
-      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem'}}>
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem'}}>
         
         {/* BOOKING FORM */}
         <div>

@@ -15,7 +15,7 @@ export default function Donate() {
       <div style={{width: '44px', height: '3px', background: '#c9a030', marginBottom: '1rem', borderRadius: '2px'}}></div>
       <p style={{color: '#7a6e6e', fontSize: '14.5px', marginBottom: '2.5rem'}}>Your generosity helps us serve our congregation and community.</p>
 
-      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start'}}>
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem'}}>
         
         {/* DONATION BOX */}
         <div style={{background: '#8b0e0e', borderRadius: '6px', padding: '2.5rem', borderTop: '4px solid #c9a030'}}>
