@@ -1,4 +1,14 @@
+'use client'
+import { useState } from 'react'
+import { supabase } from '../lib/supabase.js'
+
 export default function Giveaways() {
+  const [entering, setEntering] = useState<string | null>(null)
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [success, setSuccess] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
   const giveaways = [
     {
       title: 'Easter Hamper Giveaway',
@@ -16,13 +26,30 @@ export default function Giveaways() {
     },
     {
       title: 'Christmas Gift Basket 2024',
-      desc: 'Congratulations to the winner! Thank you all for participating. Watch out for our next giveaway.',
+      desc: 'Congratulations to the winner! Thank you all for participating.',
       ends: 'December 25, 2024',
       entries: 87,
       status: 'closed',
       winner: 'Grace Nakalembe'
     },
   ]
+
+  const handleEnter = async (title: string) => {
+    if (!name || !phone) return
+    setLoading(true)
+    const { error } = await supabase.from('giveaway_entries').insert([{
+      giveaway_title: title,
+      full_name: name,
+      phone: phone
+    }])
+    if (!error) {
+      setSuccess(title)
+      setEntering(null)
+      setName('')
+      setPhone('')
+    }
+    setLoading(false)
+  }
 
   return (
     <main style={{padding: '3rem 2rem', maxWidth: '1100px', margin: '0 auto'}}>
@@ -39,10 +66,7 @@ export default function Giveaways() {
             color: 'white',
             borderBottom: '3px solid #c9a030',
             opacity: g.status === 'closed' ? 0.8 : 1,
-            position: 'relative' as const,
-            overflow: 'hidden'
           }}>
-            {/* STATUS BADGE */}
             <span style={{
               fontSize: '10px',
               background: g.status === 'active' ? '#c9a030' : 'rgba(255,255,255,0.2)',
@@ -60,27 +84,49 @@ export default function Giveaways() {
             <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.75)', marginBottom: '1rem', lineHeight: '1.6'}}>{g.desc}</p>
 
             {g.status === 'active' && (
-              <p style={{fontSize: '11.5px', color: 'rgba(255,255,255,0.6)', marginBottom: '1.1rem'}}>{g.entries} entries so far</p>
+              <p style={{fontSize: '11.5px', color: 'rgba(255,255,255,0.6)', marginBottom: '1rem'}}>{g.entries} entries so far</p>
             )}
 
             {g.winner && (
               <p style={{fontSize: '12px', color: '#c9a030', marginBottom: '1rem', fontWeight: '500'}}>🏆 Winner: {g.winner}</p>
             )}
 
-            <button
-              disabled={g.status === 'closed'}
-              style={{
-                background: g.status === 'active' ? 'white' : 'rgba(255,255,255,0.2)',
-                color: g.status === 'active' ? '#8b0e0e' : 'rgba(255,255,255,0.5)',
-                border: 'none',
-                padding: '9px 20px',
-                borderRadius: '3px',
-                fontSize: '13px',
-                fontWeight: '500',
-                cursor: g.status === 'active' ? 'pointer' : 'default',
-                fontFamily: 'Inter, sans-serif'
-              }}
-            >{g.status === 'active' ? 'Enter Giveaway' : 'Closed'}</button>
+            {success === g.title && (
+              <p style={{fontSize: '12.5px', background: 'rgba(255,255,255,0.15)', padding: '8px 12px', borderRadius: '3px', marginBottom: '1rem'}}>
+                ✅ You're entered! Good luck!
+              </p>
+            )}
+
+            {entering === g.title && (
+              <div style={{marginBottom: '1rem'}}>
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Your full name"
+                  style={{width: '100%', background: 'rgba(255,255,255,0.1)', border: '1.5px solid rgba(255,255,255,0.3)', color: 'white', padding: '8px 12px', borderRadius: '3px', fontSize: '13px', marginBottom: '0.5rem', fontFamily: 'Inter, sans-serif'}}
+                />
+                <input
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="Your phone number"
+                  style={{width: '100%', background: 'rgba(255,255,255,0.1)', border: '1.5px solid rgba(255,255,255,0.3)', color: 'white', padding: '8px 12px', borderRadius: '3px', fontSize: '13px', marginBottom: '0.75rem', fontFamily: 'Inter, sans-serif'}}
+                />
+                <div style={{display: 'flex', gap: '0.5rem'}}>
+                  <button onClick={() => handleEnter(g.title)} disabled={loading} style={{background: 'white', color: '#8b0e0e', border: 'none', padding: '8px 16px', borderRadius: '3px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                    {loading ? 'Entering...' : 'Submit Entry'}
+                  </button>
+                  <button onClick={() => setEntering(null)} style={{background: 'transparent', color: 'white', border: '1.5px solid rgba(255,255,255,0.4)', padding: '8px 16px', borderRadius: '3px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {g.status === 'active' && entering !== g.title && success !== g.title && (
+              <button onClick={() => setEntering(g.title)} style={{background: 'white', color: '#8b0e0e', border: 'none', padding: '9px 20px', borderRadius: '3px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                Enter Giveaway
+              </button>
+            )}
           </div>
         ))}
       </div>

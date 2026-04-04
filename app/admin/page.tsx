@@ -5,24 +5,7 @@ import { useState } from 'react'
 
 export default function Admin() {
   const [page, setPage] = useState('dashboard')
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        window.location.href = '/login'
-        return
-      }
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-      if (!profile || profile.role !== 'admin') {
-        window.location.href = '/'
-      }
-    }
-    checkAdmin()
-  }, [])
+
   const [announcements, setAnnouncements] = useState([
     {title: 'Sunday Service Time Change', category: 'Urgent', date: 'Mar 28', body: 'Starting this Sunday, our main service will begin at 9:00 AM.'},
     {title: 'Youth Camp Registration Open', category: 'Youth', date: 'Mar 25', body: 'Limited slots available — register before 30th April.'},
