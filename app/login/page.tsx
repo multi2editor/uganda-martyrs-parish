@@ -9,6 +9,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [isRegister, setIsRegister] = useState(false)
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -67,11 +68,13 @@ export default function Login() {
         </p>
 
         {isRegister && (
-          <div>
-            <label style={labelStyle}>Full Name</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Your full name" style={inputStyle} />
-          </div>
-        )}
+  <div>
+    <label style={labelStyle}>Full Name</label>
+    <input value={name} onChange={e => setName(e.target.value)} placeholder="Your full name" style={inputStyle} />
+    <label style={labelStyle}>Phone Number</label>
+<input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+27 00 000 0000" style={inputStyle} />
+  </div>
+)}
 
         <div>
           <label style={labelStyle}>Email Address</label>

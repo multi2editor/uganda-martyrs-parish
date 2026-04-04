@@ -42,6 +42,7 @@ export default function Admin() {
     {id: 'announcements', label: 'Announcements', icon: '📢'},
     {id: 'members', label: 'Members', icon: '👥'},
     {id: 'donations', label: 'Donations', icon: '💰'},
+    {id: 'gallery', label: 'Gallery', icon: '🖼'},
     {id: 'giveaways', label: 'Giveaways', icon: '🎁'},
   ]
 
@@ -325,7 +326,44 @@ export default function Admin() {
             </div>
           )}
 
-          {/* GIVEAWAYS */}
+            {/* GALLERY */}
+{page === 'gallery' && (
+  <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
+    <div style={{padding: '0.75rem 1rem', borderBottom: '1px solid #e4e0d8'}}>
+      <h3 style={{fontSize: '13px', fontWeight: '500'}}>Upload photos</h3>
+    </div>
+    <div style={{padding: '1.25rem'}}>
+      <div style={{border: '2px dashed #e4e0d8', borderRadius: '6px', padding: '2rem', textAlign: 'center', marginBottom: '1.25rem'}}>
+        <p style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>🖼</p>
+        <p style={{fontSize: '13px', fontWeight: '500', color: '#8b0e0e', marginBottom: '4px'}}>Upload parish photos</p>
+        <p style={{fontSize: '12px', color: '#7a6e6e', marginBottom: '1rem'}}>JPG, PNG up to 10MB</p>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={async (e) => {
+            const files = e.target.files
+            if (!files) return
+            for (const file of Array.from(files)) {
+              await supabase.storage.from('gallery').upload(
+                `${Date.now()}-${file.name}`,
+                file
+              )
+            }
+            alert('Photos uploaded successfully!')
+          }}
+          style={{display: 'none'}}
+          id="gallery-upload"
+        />
+        <label htmlFor="gallery-upload" style={{background: '#8b0e0e', color: 'white', padding: '8px 20px', borderRadius: '3px', fontSize: '13px', fontWeight: '500', cursor: 'pointer'}}>
+          Choose Photos
+        </label>
+      </div>
+      <p style={{fontSize: '12px', color: '#7a6e6e'}}>Uploaded photos will appear automatically on the public gallery page.</p>
+    </div>
+  </div>
+)}
+{/* GIVEAWAYS */}
           {page === 'giveaways' && (
             <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'start'}}>
               <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
