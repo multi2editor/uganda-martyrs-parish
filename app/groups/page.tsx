@@ -1,4 +1,14 @@
+'use client'
+import { useState } from 'react'
+import { supabase } from '../lib/supabase.js'
+
 export default function Groups() {
+  const [joining, setJoining] = useState<string | null>(null)
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [success, setSuccess] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
   const groups = [
     {
       icon: '🙏',
@@ -28,15 +38,32 @@ export default function Groups() {
       icon: '🎵',
       title: 'Choir & Worship',
       schedule: 'Every Thursday at 6:00 PM',
-      desc: 'Join our praise team. All musical talents welcome — voice or instrument. Come glorify God with us.'
+      desc: 'Join our praise team. All musical talents welcome — voice or instrument.'
     },
     {
       icon: '👶',
       title: "Children's Ministry",
       schedule: 'Sundays during Mass',
-      desc: 'Fun, age-appropriate Bible stories and activities for ages 3–12. Safe and nurturing environment.'
+      desc: 'Fun, age-appropriate Bible stories and activities for ages 3–12.'
     },
   ]
+
+  const handleJoin = async (groupTitle: string) => {
+    if (!name || !phone) return
+    setLoading(true)
+    const { error } = await supabase.from('group_members').insert([{
+      group_name: groupTitle,
+      full_name: name,
+      phone: phone
+    }])
+    if (!error) {
+      setSuccess(groupTitle)
+      setJoining(null)
+      setName('')
+      setPhone('')
+    }
+    setLoading(false)
+  }
 
   return (
     <main style={{padding: '3rem 2rem', maxWidth: '1100px', margin: '0 auto'}}>
@@ -57,36 +84,50 @@ export default function Groups() {
             gap: '0.75rem'
           }}>
             <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
-              <div style={{
-                width: '52px',
-                height: '52px',
-                background: '#8b0e0e',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '22px',
-                flexShrink: 0
-              }}>{g.icon}</div>
+              <div style={{width: '52px', height: '52px', background: '#8b0e0e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0}}>{g.icon}</div>
               <div>
                 <h3 style={{fontFamily: 'Georgia, serif', fontSize: '1.1rem', color: '#8b0e0e'}}>{g.title}</h3>
                 <p style={{fontSize: '11.5px', color: '#c9a030', fontWeight: '500'}}>{g.schedule}</p>
               </div>
             </div>
             <p style={{fontSize: '13.5px', color: '#7a6e6e', lineHeight: '1.65'}}>{g.desc}</p>
-            <button style={{
-              background: 'transparent',
-              border: '1.5px solid #8b0e0e',
-              color: '#8b0e0e',
-              padding: '8px 18px',
-              borderRadius: '3px',
-              fontSize: '12.5px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              fontFamily: 'Inter, sans-serif',
-              alignSelf: 'flex-start' as const,
-              marginTop: 'auto'
-            }}>Join this group</button>
+
+            {success === g.title && (
+              <p style={{fontSize: '13px', background: '#eaf5ee', color: '#1a7a3a', padding: '8px 12px', borderRadius: '3px'}}>
+                ✅ Request sent! We'll be in touch soon.
+              </p>
+            )}
+
+            {joining === g.title && (
+              <div>
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Your full name"
+                  style={{width: '100%', border: '1.5px solid #e4e0d8', borderRadius: '3px', padding: '8px 12px', fontSize: '13px', marginBottom: '0.5rem', fontFamily: 'Inter, sans-serif'}}
+                />
+                <input
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="Your phone number"
+                  style={{width: '100%', border: '1.5px solid #e4e0d8', borderRadius: '3px', padding: '8px 12px', fontSize: '13px', marginBottom: '0.75rem', fontFamily: 'Inter, sans-serif'}}
+                />
+                <div style={{display: 'flex', gap: '0.5rem'}}>
+                  <button onClick={() => handleJoin(g.title)} disabled={loading} style={{background: '#8b0e0e', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '3px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                    {loading ? 'Sending...' : 'Send Request'}
+                  </button>
+                  <button onClick={() => setJoining(null)} style={{background: 'transparent', color: '#7a6e6e', border: '1.5px solid #e4e0d8', padding: '8px 16px', borderRadius: '3px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {joining !== g.title && success !== g.title && (
+              <button onClick={() => setJoining(g.title)} style={{background: 'transparent', border: '1.5px solid #8b0e0e', color: '#8b0e0e', padding: '8px 18px', borderRadius: '3px', fontSize: '12.5px', fontWeight: '500', cursor: 'pointer', fontFamily: 'Inter, sans-serif', alignSelf: 'flex-start' as const}}>
+                Join this group
+              </button>
+            )}
           </div>
         ))}
       </div>
