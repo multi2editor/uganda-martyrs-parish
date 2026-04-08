@@ -82,6 +82,7 @@ export default function Bookings() {
                   <option>Funeral Service</option>
                   <option>Confirmation</option>
                   <option>Special Prayer Session</option>
+                  <option>Tombstone Unveiling</option> 
                 </select>
               </div>
 

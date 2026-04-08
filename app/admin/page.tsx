@@ -78,6 +78,7 @@ export default function Admin() {
     {id: 'donations', label: 'Donations', icon: '💰'},
     {id: 'gallery', label: 'Gallery', icon: '🖼'},
     {id: 'giveaways', label: 'Giveaways', icon: '🎀'},
+    {id: 'group_announcements', label: 'Group Updates', icon: '👥'},
   ]
 
   const sidebarStyle = {
@@ -382,7 +383,69 @@ export default function Admin() {
               </div>
             </div>
           )}
-
+{/* GROUP ANNOUNCEMENTS */}
+{page === 'group_announcements' && (
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'start'}}>
+    <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
+      <div style={{padding: '0.75rem 1rem', borderBottom: '1px solid #e4e0d8'}}>
+        <h3 style={{fontSize: '13px', fontWeight: '500'}}>Post group update</h3>
+      </div>
+      <div style={{padding: '1rem'}}>
+        <div style={{marginBottom: '0.85rem'}}>
+          <label style={{display: 'block', fontSize: '11px', color: '#7a6e6e', marginBottom: '4px', textTransform: 'uppercase' as const, letterSpacing: '0.3px'}}>Select Group</label>
+          <select id="group-select" style={{width: '100%', border: '1.5px solid #e4e0d8', borderRadius: '3px', padding: '8px 12px', fontSize: '13px', fontFamily: 'Inter, sans-serif'}}>
+            <option>Men's Fellowship</option>
+            <option>Women's Fellowship</option>
+            <option>Youth Fellowship</option>
+            <option>Children's Ministry</option>
+            <option>Association of the Childhood of Jesus</option>
+            <option>St. Mary - Ikhwezi</option>
+            <option>St. John Bosco</option>
+            <option>St. Joseph</option>
+            <option>St. Anne</option>
+            <option>Catholic Women's League</option>
+            <option>Legion of Mary</option>
+            <option>St. Francis</option>
+            <option>Sacred Heart</option>
+            <option>St. Dominic</option>
+            <option>Choir</option>
+          </select>
+        </div>
+        <div style={{marginBottom: '0.85rem'}}>
+          <label style={{display: 'block', fontSize: '11px', color: '#7a6e6e', marginBottom: '4px', textTransform: 'uppercase' as const, letterSpacing: '0.3px'}}>Title</label>
+          <input id="group-ann-title" placeholder="Update title" style={{width: '100%', border: '1.5px solid #e4e0d8', borderRadius: '3px', padding: '8px 12px', fontSize: '13px', fontFamily: 'Inter, sans-serif'}} />
+        </div>
+        <div style={{marginBottom: '1rem'}}>
+          <label style={{display: 'block', fontSize: '11px', color: '#7a6e6e', marginBottom: '4px', textTransform: 'uppercase' as const, letterSpacing: '0.3px'}}>Message</label>
+          <textarea id="group-ann-body" placeholder="Write your group update..." style={{width: '100%', border: '1.5px solid #e4e0d8', borderRadius: '3px', padding: '8px 12px', fontSize: '13px', fontFamily: 'Inter, sans-serif', minHeight: '80px', resize: 'vertical'}} />
+        </div>
+        <button
+          onClick={async () => {
+            const group = (document.getElementById('group-select') as HTMLSelectElement).value
+            const title = (document.getElementById('group-ann-title') as HTMLInputElement).value
+            const body = (document.getElementById('group-ann-body') as HTMLTextAreaElement).value
+            if (!title || !body) return
+            const { error } = await supabase.from('group_announcements').insert([{group_name: group, title, body}])
+            if (!error) {
+              alert(`Update posted to ${group}!`)
+              ;(document.getElementById('group-ann-title') as HTMLInputElement).value = ''
+              ;(document.getElementById('group-ann-body') as HTMLTextAreaElement).value = ''
+            }
+          }}
+          style={{background: '#8b0e0e', color: 'white', border: 'none', padding: '9px 20px', borderRadius: '3px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}
+        >Post Group Update</button>
+      </div>
+    </div>
+    <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
+      <div style={{padding: '0.75rem 1rem', borderBottom: '1px solid #e4e0d8'}}>
+        <h3 style={{fontSize: '13px', fontWeight: '500'}}>Recent group updates</h3>
+      </div>
+      <div style={{padding: '0.75rem 1rem'}}>
+        <p style={{fontSize: '13px', color: '#7a6e6e', textAlign: 'center', padding: '1rem'}}>Post an update to see it here.</p>
+      </div>
+    </div>
+  </div>
+)}
           {/* DONATIONS */}
           {page === 'donations' && (
             <div>
