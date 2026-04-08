@@ -14,6 +14,7 @@ export default function Navbar() {
     {label: 'Gallery', href: '/gallery'},
     {label: 'Shop', href: '/shop'},
     {label: 'Contact', href: '/contact'},
+    {label: 'Calendar', href: '/calendar'},
   ]
 
   return (
