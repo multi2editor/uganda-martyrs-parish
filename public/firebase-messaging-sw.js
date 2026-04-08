@@ -2,18 +2,16 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js')
 
 firebase.initializeApp({
-  apiKey: self.FIREBASE_API_KEY,
-  authDomain: self.FIREBASE_AUTH_DOMAIN,
-  projectId: self.FIREBASE_PROJECT_ID,
-  storageBucket: self.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: self.FIREBASE_MESSAGING_SENDER_ID,
-  appId: self.FIREBASE_APP_ID,
+  apiKey: AIzaSyC9RLVgVSsO337rTcgsozc-NcB0z3VJmpg,
+  authDomain: uganda-martyrs-parish.firebaseapp.com,
+  projectId: uganda-martyrs-parish,
+  messagingSenderId: 1028182330524,
+  appId: "1:1028182330524:web:71ba918fb1f615eea03159", 
 })
 
 const messaging = firebase.messaging()
 
 messaging.onBackgroundMessage((payload) => {
-  console.log('Background message received:', payload)
   const { title, body } = payload.notification
   self.registration.showNotification(title, {
     body,
