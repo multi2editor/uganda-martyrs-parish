@@ -250,8 +250,8 @@ const SAINTS: Record<string, string> = {
 
 const PARISH_EVENTS: Record<string, string[]> = {
   '06-03': ['Uganda Martyrs Day — Special Commemorative Mass at 9:00 AM'],
-  '12-25': ['Christmas Day Mass — 9:00 AM & 11:30 AM'],
-  '01-01': ['New Year Mass — 9:00 AM'],
+  '12-25': ['Christmas Day Mass — 7:30 AM & 10:00 AM'],
+  '01-01': ['New Year Mass — to be confirmed'],
 }
 
 function getLiturgicalSeason(month: number, day: number): string {
@@ -417,7 +417,7 @@ export default function Calendar() {
                 {isSunday(selectedDay) && (
                   <div style={{background: '#fdeaea', border: '1px solid #8b0e0e', borderRadius: '6px', padding: '0.75rem'}}>
                     <p style={{fontSize: '10px', textTransform: 'uppercase' as const, letterSpacing: '1px', color: '#8b0e0e', fontWeight: '600', marginBottom: '2px'}}>Sunday Mass</p>
-                    <p style={{fontSize: '13px', color: '#8b0e0e'}}>9:00 AM & 11:30 AM</p>
+                    <p style={{fontSize: '13px', color: '#8b0e0e'}}>7:30 AM & 10:00 AM</p>
                     <p style={{fontSize: '11px', color: '#7a6e6e', marginTop: '2px'}}>Uganda Martyrs Parish, Umlazi G</p>
                   </div>
                 )}
