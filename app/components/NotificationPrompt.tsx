@@ -3,34 +3,24 @@ import { useEffect, useState } from 'react'
 
 export default function NotificationPrompt() {
   const [show, setShow] = useState(false)
-  const [granted, setGranted] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission === 'default') {
         setTimeout(() => setShow(true), 3000)
-      } else if (Notification.permission === 'granted') {
-        setGranted(true)
       }
     }
   }, [])
 
   const handleAllow = async () => {
-    try {
-      const permission = await Notification.requestPermission()
-      if (permission === 'granted') {
-        setGranted(true)
-        setShow(false)
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-          const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
-          console.log('Service worker registered:', registration)
-        }
-      } else {
-        setShow(false)
-      }
-    } catch (error) {
-      console.error('Notification error:', error)
+    const permission = await Notification.requestPermission()
+    if (permission === 'granted') {
+      setShow(false)
+      new Notification('Uganda Martyrs Parish', {
+        body: 'You will now receive parish updates and announcements!',
+        icon: '/logo.webp'
+      })
+    } else {
       setShow(false)
     }
   }
