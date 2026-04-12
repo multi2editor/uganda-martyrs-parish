@@ -9,15 +9,28 @@ export default function NotificationPrompt() {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission === 'default') {
         setTimeout(() => setShow(true), 3000)
+      } else if (Notification.permission === 'granted') {
+        setGranted(true)
       }
     }
   }, [])
 
   const handleAllow = async () => {
-    const { requestNotificationPermission } = await import('../lib/firebase.js')
-    const token = await requestNotificationPermission()
-    if (token) {
-      setGranted(true)
+    try {
+      const permission = await Notification.requestPermission()
+      if (permission === 'granted') {
+        setGranted(true)
+        setShow(false)
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+          const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+          console.log('Service worker registered:', registration)
+        }
+      } else {
+        setShow(false)
+      }
+    } catch (error) {
+      console.error('Notification error:', error)
       setShow(false)
     }
   }
@@ -49,25 +62,14 @@ export default function NotificationPrompt() {
       </p>
       <div style={{display: 'flex', gap: '0.5rem'}}>
         <button onClick={handleAllow} style={{
-          background: '#8b0e0e',
-          color: 'white',
-          border: 'none',
-          padding: '8px 16px',
-          borderRadius: '3px',
-          fontSize: '12.5px',
-          fontWeight: '500',
-          cursor: 'pointer',
-          fontFamily: 'Inter, sans-serif',
-          flex: 1
+          background: '#8b0e0e', color: 'white', border: 'none',
+          padding: '8px 16px', borderRadius: '3px', fontSize: '12.5px',
+          fontWeight: '500', cursor: 'pointer', fontFamily: 'Inter, sans-serif', flex: 1
         }}>Allow</button>
         <button onClick={() => setShow(false)} style={{
-          background: 'transparent',
-          color: '#7a6e6e',
-          border: '1.5px solid #e4e0d8',
-          padding: '8px 16px',
-          borderRadius: '3px',
-          fontSize: '12.5px',
-          cursor: 'pointer',
+          background: 'transparent', color: '#7a6e6e',
+          border: '1.5px solid #e4e0d8', padding: '8px 16px',
+          borderRadius: '3px', fontSize: '12.5px', cursor: 'pointer',
           fontFamily: 'Inter, sans-serif'
         }}>Later</button>
       </div>
