@@ -32,6 +32,8 @@ export default function Home() {
     {icon: '🙏', title: 'Give & Donate', sub: 'Support our mission', href: '/donate'},
     {icon: '📅', title: 'Book Events', sub: 'Baptism, weddings & more', href: '/bookings'},
     {icon: '👥', title: 'Groups', sub: 'Find your community', href: '/groups'},
+    {icon: '✝️', title: 'Catechesis', sub: 'Faith formation', href: '/catechesis'},
+    {icon: '⭐', title: 'St. Antony', sub: 'Parish society', href: '/st-antony'},
     {icon: '🎁', title: 'Giveaways', sub: 'Active competitions', href: '/giveaways'},
     {icon: '🛍️', title: 'Shop', sub: 'Parish merchandise', href: '/shop'},
     {icon: '📺', title: 'Live Streams', sub: 'Watch Sunday mass', href: '/streams'},
@@ -40,7 +42,6 @@ export default function Home() {
     {icon: '📍', title: 'Contact Us', sub: 'Umlazi G, South Africa', href: '/contact'},
     {icon: '🔐', title: 'Sign In', sub: 'Member access', href: '/login'},
   ]
-
   return (
     <main style={{fontFamily: 'Inter, sans-serif'}}>
 

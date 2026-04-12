@@ -170,10 +170,10 @@ export default function Admin() {
           {page === 'dashboard' && (
             <div>
               <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem'}}>
-                {statCard('Total members', '148', '↑ 4 this month')}
+                {statCard('Total members', '0', '↑ 0 this month')}
                 {statCard('Pending bookings', `${bookings.filter(b => b.status === 'pending').length}`, 'Awaiting review', '#b07800')}
-                {statCard('Donations (Apr)', 'R4,820', '↑ 12% vs March')}
-                {statCard('Active giveaways', '2', 'Ends this month')}
+                {statCard('Donations (Apr)', 'R0.00', '↑ 0% vs March')}
+                {statCard('Active giveaways', '0', 'Ends this month')}
               </div>
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
                 <div style={{background: 'white', borderRadius: '6px', border: '1px solid #e4e0d8', overflow: 'hidden'}}>
@@ -409,6 +409,8 @@ export default function Admin() {
             <option>Sacred Heart</option>
             <option>St. Dominic</option>
             <option>Choir</option>
+            <option>Catechesis</option>
+            <option>St. Antony</option>
           </select>
         </div>
         <div style={{marginBottom: '0.85rem'}}>
